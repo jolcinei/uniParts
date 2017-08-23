@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+   <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.j    s"></script>-->
+    {% load static %}
+    {% include 'material/includes/material_css.html' %}
+    <script src="{% static 'material/js/jquery.js' %}"></script>
+    {% include 'material/includes/material_js.html' %}
+    {% load material_form %}
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="conteiner-fluid">
+            <div class="navbar-header">
+
+                {% if user.is_authenticated %}
+                  <p style="color: gray; font-size:12px;">Bem vindo, {{ user.first_name }}. </p>
+                     <li>
+                        <a href="/">
+                          <i class="material-icons right">exit_to_app</i>
+                           Encerrar sessão
+                        </a>
+                     </li>
+                {% else %}
+                  <p style="color: gray; font-size:12px;">Bem vindo, usuário. Por favor faça o login no sistema.</p>
+                    <li>
+                       <li><a href="/">
+                           <i class="material-icons left">login</i>
+                           Logar
+                      </a>
+                    </li>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+<div class="fixed-action-btn">
+    {% if user.is_authenticated %}
+            <a href="{% url 'parte_new' %}" class="btn-floating btn-large waves-effect waves-light red z-depth-2">
+                <i class="large material-icons">add</i>
+            </a>
+    {% endif %}
+</div>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

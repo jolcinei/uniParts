@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+    Nova Validação
+{% endblock title %}
+{% block content %}
+
+    <form method="POST" class="validacao-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Salvar</button>
+    </form>
+
+{% endblock %}

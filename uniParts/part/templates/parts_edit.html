@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+    Nova Parte
+{% endblock title %}
+{% block content %}
+    <form method="POST" class="parte-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Salvar</button>
+    </form>
+{% endblock %}
