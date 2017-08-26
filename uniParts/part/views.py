@@ -9,8 +9,9 @@ def parts_list(request, template_name="parts_list.html"):
         parte = Parte.objects.filter(descricao__icontains=query)
     else:
         parte = Parte.objects.all()
-    partes = {'lista':parte}
-    return render(request,template_name,partes)
+    validacao = Validacao.objects.select_related('parte')
+    contexto = {'lista':parte, 'validations':validacao}
+    return render(request,template_name,contexto)
 
 def parte_new(request):
     if request.method == "POST":

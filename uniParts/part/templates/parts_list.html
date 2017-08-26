@@ -7,7 +7,8 @@ Lista de Partes
 {% endblock title %}
 
 {% block content %}
-<div class="row">
+
+<div class="row ">
     <form method="get">
         <div class="col-lg-12">
             <div class="input-group">
@@ -22,22 +23,17 @@ Lista de Partes
 <br>
 <div class="row">
     {% for parte in lista %}
-    <div class="col-md-4">
-        <div class="thumbnail">
+    <div class="col s8 m4">
+        <div class="card-panel grey lighten-5">
             <a href="/admin/part/parte/{{parte.pk}}">
                <!-- <img src="{{hora.foto.url}}" style="width:100%"> -->
-                <div>
-                <ul class="caption">
-                   <li style="background-color:#37474f; text-align:center;color:yellow;">{{parte.status}}</li>
-                   <li>Solicitante: {{parte.author.get_full_name}}</li>
-                   <li>{{parte.descricao}}</li>
-                    <tr>
-                        <td>Data de inicio: {{parte.data_inicio}} - </td>
-                        <td>Data de fim: {{parte.data_fim}}</td>
-                    </tr>
-                        <li>Data de criação: {{parte.data_criacao}}</li>
-                    </ul>
-                </div>
+
+                   <p style="background-color:#37474f; text-align:center;color:yellow;">{{parte.status}}</p>
+                   <p>Solicitante: {{parte.author.get_full_name}}</p>
+                   <p>{{parte.descricao}}</p>
+                   <p>Data de inicio: {{parte.data_inicio}} - Data de fim: {{parte.data_fim}}</p>
+                   <p>Data de criação: {{parte.data_criacao}}</p>
+
             </a>
             <div class="btn-floating btn-large waves-effect waves-light green z-depth-2 ">
                     {% if user.is_authenticated %}
@@ -45,9 +41,26 @@ Lista de Partes
                           <i class="small material-icons">gavel</i>
                          </a>
                      {% endif %}
-                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col s4 m2">
+        <div class="card-panel lime accent-2">
+            {% for validacao in validations %}
+                {% if validacao.parte.pk == parte.pk %}
+                    <div>
+                        <div>
+                            <a href="/admin/part/validacao/{{validacao.pk}}">
+                                <li>{{ validacao.observacao }}</li>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
     {% endfor %}
 </div>
+
 {% endblock content %}
