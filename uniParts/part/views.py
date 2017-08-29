@@ -3,12 +3,39 @@ from .models import *
 from django.shortcuts import redirect
 from .forms import *
 
-def parts_list(request, template_name="parts_list.html"):
-    query = request.GET.get("busca",'')
-    if query:
-        parte = Parte.objects.filter(descricao__icontains=query)
+def parts_list(request, tipo, template_name="parts_list.html"):
+    usuario = request.user
+    query = request.GET.get("busca", '')
+    if usuario.is_superuser:
+            if query:
+                if tipo == "publicadas":
+                     parte = Parte.objects.filter(descricao__icontains=query, status__icontains='PUBLICADO')
+                elif tipo != "todas":
+                     parte = Parte.objects.filter(descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
+                else:
+                     parte = Parte.objects.filter(descricao__icontains=query)
+            else:
+                 if tipo == "publicadas":
+                    parte = Parte.objects.filter(status__icontains='PUBLICADO')
+                 elif tipo != "todas":
+                    parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo)
+                 else:
+                    parte = Parte.objects.all()
     else:
-        parte = Parte.objects.all()
+            if query:
+                if tipo == "publicadas":
+                    parte = Parte.objects.filter(descricao__icontains=query, status__icontains='PUBLICADO')
+                elif tipo != "todas":
+                    parte = Parte.objects.filter(author=usuario,descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
+                else:
+                    parte = Parte.objects.filter(author=usuario,descricao__icontains=query)
+            else:
+                if tipo == "publicadas":
+                    parte = Parte.objects.filter(author=usuario,status__contains='PUBLICADO')
+                elif tipo != "todas":
+                    parte = Parte.objects.filter(author=usuario,tipoParte__tpDescricao__icontains=tipo)
+                else:
+                    parte = Parte.objects.filter(author=usuario)
     validacao = Validacao.objects.select_related('parte')
     contexto = {'lista':parte, 'validations':validacao}
     return render(request,template_name,contexto)

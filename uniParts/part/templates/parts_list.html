@@ -23,29 +23,44 @@ Lista de Partes
 <br>
 <div class="row">
     {% for parte in lista %}
-    <div class="col s8 m4">
+    <div class="col s8">
         <div class="card-panel grey lighten-5">
             <a href="/admin/part/parte/{{parte.pk}}">
                <!-- <img src="{{hora.foto.url}}" style="width:100%"> -->
 
-                   <p style="background-color:#37474f; text-align:center;color:yellow;">{{parte.status}}</p>
+                   <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}}</p>
                    <p>Solicitante: {{parte.author.get_full_name}}</p>
                    <p>{{parte.descricao}}</p>
-                   <p>Data de inicio: {{parte.data_inicio}} - Data de fim: {{parte.data_fim}}</p>
+                    <div class="card-content green-text">
+                        <p>Data inicio: {{parte.data_inicio}}</p>
+                        <p>Data fim: {{parte.data_fim}}</p>
+                    </div>
                    <p>Data de criação: {{parte.data_criacao}}</p>
+                {% if parte.boletim_interno is not None %}
+                    <div class="card-content yellow-text">
+                        <p>Data de publicação: {{parte.data_publicacao}}</p>
+                    </div>
+                {% endif %}
 
             </a>
-            <div class="btn-floating btn-large waves-effect waves-light green z-depth-2 ">
-                    {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
+            <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
                          <a href="{% url 'validacao_new' pk=parte.pk %}">
                           <i class="small material-icons">gavel</i>
                          </a>
-                     {% endif %}
             </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
+                         <a href="!#">
+                          <i class="small material-icons">send</i>
+                         </a>
+            </div>
+            {% endif %}
         </div>
 
     </div>
-    <div class="col s4 m2">
+    <div class="col s4">
         <div class="card-panel lime accent-2">
             {% for validacao in validations %}
                 {% if validacao.parte.pk == parte.pk %}

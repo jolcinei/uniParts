@@ -89,5 +89,3 @@ class Validacao(models.Model):
     def __str__(self):
         return self.observacao
 
-   # def __init__(self, par):
-       # self.parte = par
