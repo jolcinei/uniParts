@@ -6,20 +6,28 @@
         {% block title %}
         {% endblock %}
     </title>
-   <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.j    s"></script>-->
+    <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
     {% load static %}
     {% include 'material/includes/material_css.html' %}
     <script src="{% static 'material/js/jquery.js' %}"></script>
     {% include 'material/includes/material_js.html' %}
-    {% load material_form %}
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script>
+    $(document).ready(function() {
+      $('.datepicker').datepicker({ dateFormat: 'dd/mm/yy' });
+    });
+    </script>
+    {% load material_form material_form_internal %}
 </head>
 <body>
 <nav>
         <div class="row">
                 {% if user.is_authenticated %}
                 <div class="col s11">
-                  Bem vindo, {{ user.first_name }}.
+                  Bem vindo(a), {{ user.first_name }}.
                     </div>
                  <div class="col s1">
                         <a href="/admin/logout/">
@@ -29,7 +37,7 @@
                 </div>
                 {% else %}
                  <div class="col s11">
-                     Bem vindo, usuário. Por favor faça o login no sistema.
+                     Bem vindo(a), usuário. Por favor faça o login no sistema.
                  </div>
                   <div class="col s1">
                       <a href="/admin/login/">

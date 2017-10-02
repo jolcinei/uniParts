@@ -22,6 +22,9 @@ class TipoParte(models.Model):
     def __str__(self):
         return self.tpDescricao
 
+    def __unicode__(self):
+        return self.tpDescricao
+
 class NivelAutorizacao(models.Model):
     SUP='superior'
     SUB='subcomando'
@@ -34,6 +37,9 @@ class NivelAutorizacao(models.Model):
     nivel = models.CharField(max_length=20,choices=NIVEL)
     def __str__(self):
         return str(self.nivel)
+
+    def __unicode__(self):
+        return self.nivel
 
 class Parte(models.Model):
     NOVA = 'NOVA'
@@ -56,10 +62,10 @@ class Parte(models.Model):
     data_criacao = models.DateTimeField(
             default=timezone.now)
 
-    tipoParte = models.ForeignKey(TipoParte)
+    tipoParte = models.ForeignKey(TipoParte, null=False)
     upload = models.FileField(null=True,blank=True,verbose_name='Anexo',upload_to='uploads/%Y/%m/%d/')
     boletim_interno = models.CharField(verbose_name='Boletim Interno',max_length=16,null=True,blank=True)
-    data_publicacao = models.DateTimeField(verbose_name='Data de Publicação',null=True,blank=True)
+    data_publicacao = models.DateField(verbose_name='Data de Publicação',null=True,blank=True)
 
     class Meta:
         verbose_name = 'parte'

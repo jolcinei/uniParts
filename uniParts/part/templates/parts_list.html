@@ -38,6 +38,7 @@ Lista de Partes
                    <p>Data de criação: {{parte.data_criacao}}</p>
                 {% if parte.boletim_interno is not None %}
                     <div class="card-content yellow-text">
+                        <p>Boletim Interno: {{parte.boletim_interno}}</p>
                         <p>Data de publicação: {{parte.data_publicacao}}</p>
                     </div>
                 {% endif %}
@@ -49,8 +50,22 @@ Lista de Partes
                           <i class="small material-icons">gavel</i>
                          </a>
             </div>
+
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
+                         <a href="{% url 'parte_edit' pk=parte.pk %}">
+                          <i class="small material-icons">event_available</i>
+                         </a>
+            </div>
             {% endif %}
             {% if user.is_authenticated %}
+            <div class="right center btn-floating waves-effect waves-light red z-depth-2 ">
+                         <a href="{% url 'exportToPdf' pk=parte.pk %}">
+                          <i class="small material-icons">picture_as_pdf</i>
+                         </a>
+            </div>
             <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
                          <a href="!#">
                           <i class="small material-icons">send</i>
