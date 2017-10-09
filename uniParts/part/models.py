@@ -29,10 +29,12 @@ class NivelAutorizacao(models.Model):
     SUP='superior'
     SUB='subcomando'
     COM='comando'
+    NEM='nenhum'
     NIVEL = (
         (SUP, 'SUPERIOR'),
         (SUB, 'SUBCOMANDO'),
         (COM, 'COMANDO'),
+        (NEM, 'NENHUM')
     )
     nivel = models.CharField(max_length=20,choices=NIVEL)
     def __str__(self):
@@ -66,7 +68,8 @@ class Parte(models.Model):
     upload = models.FileField(null=True,blank=True,verbose_name='Anexo',upload_to='uploads/%Y/%m/%d/')
     boletim_interno = models.CharField(verbose_name='Boletim Interno',max_length=16,null=True,blank=True)
     data_publicacao = models.DateField(verbose_name='Data de Publicação',null=True,blank=True)
-
+    prejuizo = models.BooleanField(verbose_name='Prejuizo a escala de serviço')
+    onus = models.BooleanField(verbose_name='Com onus ao estado')
     class Meta:
         verbose_name = 'parte'
         verbose_name_plural = 'partes'
@@ -89,9 +92,33 @@ class Validacao(models.Model):
     observacao = models.TextField(null=False)
     data_autorizacao = models.DateTimeField(
             blank=True, null=True)
-    nivelAutorizacao = models.ForeignKey(NivelAutorizacao)
     parte = models.ForeignKey(Parte)
-
+    user_validacao = models.ForeignKey('auth.User',null=True,blank=True)
     def __str__(self):
         return self.observacao
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, related_name='profile')
+    SOLDADO = 'Sd.'
+    CABO = 'Cb.'
+    SARGENTO = 'Sgt.'
+    SUBTENENTE = 'SubTen.'
+    TENENTE = 'Ten.'
+    CAPITAO = 'Cap.'
+    MAJOR = 'Maj.'
+    CORONEL = 'Cel.'
+    HIERARQUIA = (
+        (SOLDADO, 'SOLDADO'),
+        (CABO, 'CABO'),
+        (SARGENTO, 'SARGENTO'),
+        (SUBTENENTE, 'SUBTENENTE'),
+        (TENENTE, 'TENENTE'),
+        (CAPITAO, 'CAPITAO'),
+        (MAJOR, 'MAJOR'),
+        (CORONEL, 'CORONEL'),
+    )
+    graduacao = models.CharField(max_length=32,choices=HIERARQUIA)
+    nivelAutorizacao = models.ForeignKey(NivelAutorizacao)
+    def __str__(self):
+        return self.graduacao + self.user.first_name
 

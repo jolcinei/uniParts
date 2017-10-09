@@ -1,16 +1,16 @@
 from textwrap import wrap
-
 from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.shortcuts import redirect
 from .forms import *
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
 from django.http import HttpResponse
 
 
-def parts_list(request, tipo, template_name="parts_list.html"):
+def parts_list(request, tipo=None, template_name="parts_list.html"):
+    if tipo == None:
+        tipo = "todas"
     query = request.GET.get("busca", '')
     if request.user.is_superuser:
         if query:
@@ -99,6 +99,9 @@ def validacao_new(request, pk):
             validacao = form.save(commit=False)
             validacao.parte = par
             validacao.data_autorizacao = timezone.now()
+            usuario = request.user
+            validacao.observacao = validacao.observacao + ' Por: '+ usuario.first_name
+            validacao.user_validacao = usuario
             validacao.save()
             validacoes = Validacao.objects.select_related('parte')
             i = 0
@@ -133,21 +136,76 @@ def exportToPdf(request, pk):
     p.drawString(20, 785, '5º CRPM')
     p.drawString(20, 770, '6º BPM')
     # Cabeçalho lado direito
-    data = format(par.data_criacao)
-    p.drawString(360, 800, 'Cascavel ' + data)
+    Meses = ('Jan', 'Fev.', 'Mar.', 'Abr.', 'Maio', 'Jun.',
+    'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.')
+    dia = par.data_criacao.strftime('%d')
+    mes = par.data_criacao.month-1
+    ano = par.data_criacao.strftime('%Y')
+    #data = par.data_criacao.strftime('%d/%m/%Y')
+    yy = 770
+    xx = 370
+    p.drawString(xx, 800, 'Cascavel ' + dia + ' ' + Meses[mes] + ' ' + ano)
     numero = format(par.id)
-    p.drawString(360, 785, 'Parte nº ' + numero)
-    nome = format(par.author.get_full_name())
-    p.drawString(360, 770, 'Do Sd. QPM 1-0 ' + nome.title())
-    p.drawString(360, 755, 'Assunto: '+str(par.tipoParte))
+    p.drawString(xx, 785, 'Parte nº ' + numero)
+    nome = str(par.author.get_full_name())
+    nombre = []
+    nombre.append('Do Sd. QPM 1-0 ')
+    nombre.append(nome)
+    nombre = ''.join(nombre)
+    for n in wrap(nombre,25):
+        p.drawString(xx, yy,  n.title())
+        yy -=15
+    p.drawString(xx, yy, 'Assunto: '+str(par.tipoParte))
     # Texto da parte
     y = 550
-    for line in wrap(par.descricao, 70):
+    for line in wrap(par.descricao, 75):
         p.drawString(20, y, line)
         y -= 15
-
+    dia_inicio = par.data_inicio.strftime('%d')
+    mes_inicio = par.data_inicio.month-1
+    ano_inicio = par.data_inicio.strftime('%Y')
+    dia_fim = par.data_fim.strftime('%d')
+    mes_fim = par.data_fim.month - 1
+    ano_fim = par.data_fim.strftime('%Y')
+    p.drawString(20,y, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
     # Nome do solicitante
-    p.drawString(300, 240, 'Sd. QPM 1-0 ' + nome.title())
+    yyy = 240
+    for l in wrap(nombre, 40):
+        p.drawString(300, yyy, l)
+        yyy -=15
+    p.setFont('Courier-Bold', 12)
+    p.drawString(350, yyy, 'Solicitante')
     p.showPage()
+    validacoes = Validacao.objects.select_related('parte')
+    yyyy = 650
+    for v in validacoes:
+        if v.parte == par:
+            p.setFont('Courier', 12)
+            # Cabeçalho lado esquerdo
+            p.drawString(20, 800, 'PMPR')
+            p.drawString(20, 785, '5º CRPM')
+            p.drawString(20, 770, '6º BPM')
+
+
+            for line in wrap(v.observacao, 30):
+                p.drawString(20, yyyy, line)
+                yyyy -= 15
+
+            if v.user_validacao != None:
+                p.drawString(45,yyyy-45,v.user_validacao.get_full_name())
+            p.showPage()
     p.save()
     return response
+
+def negado(request, pk):
+    parte = get_object_or_404(Parte, pk=pk)
+    parte.status = 'NEGADO'
+    usuario = request.user
+    validacao = Validacao()
+    validacao.observacao = 'Negado por ' + usuario.first_name + ' em pré analise.'
+    validacao.data_autorizacao = timezone.now()
+    validacao.user_validacao = usuario
+    validacao.parte = parte
+    validacao.save()
+    parte.save()
+    return redirect('/partes/listar/todas/')

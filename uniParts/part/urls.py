@@ -8,5 +8,6 @@ urlpatterns= [
     url(r'^parte/edit/(?P<pk>\d+)/$', parte_edit, name='parte_edit'),
     url(r'^validacao/new/(?P<pk>\d+)/$', validacao_new, name='validacao_new'),
     url(r'^exportToPdf/(?P<pk>\d+)/$', exportToPdf, name='exportToPdf'),
+    url(r'^negado/(?P<pk>\d+)/$', negado, name='negado'),
     url(r'^$', parts_list, name='parts_list'),
 ]

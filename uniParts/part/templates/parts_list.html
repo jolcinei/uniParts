@@ -45,32 +45,39 @@ Lista de Partes
 
             </a>
             {% if user.is_authenticated %}
+
+            <div class="container">
+                {% if parte.boletim_interno is None %}
             <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
                          <a href="{% url 'validacao_new' pk=parte.pk %}">
                           <i class="small material-icons">gavel</i>
                          </a>
             </div>
-
-            {% endif %}
-
-            {% if user.is_authenticated %}
-            <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
+            <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
+                         <a href="{% url 'negado' pk=parte.pk %}">
+                          <i class="small material-icons">block</i>
+                         </a>
+            </div>
+                 {% if parte.status == 'AUTORIZADO' %}
+                    <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
                          <a href="{% url 'parte_edit' pk=parte.pk %}">
                           <i class="small material-icons">event_available</i>
                          </a>
-            </div>
-            {% endif %}
-            {% if user.is_authenticated %}
-            <div class="right center btn-floating waves-effect waves-light red z-depth-2 ">
-                         <a href="{% url 'exportToPdf' pk=parte.pk %}">
-                          <i class="small material-icons">picture_as_pdf</i>
-                         </a>
-            </div>
+                    </div>
+                  {% endif %}
             <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
                          <a href="!#">
                           <i class="small material-icons">send</i>
                          </a>
             </div>
+                {% endif %}
+                <div class="center btn-floating waves-effect waves-light gray z-depth-2 ">
+                         <a href="{% url 'exportToPdf' pk=parte.pk %}">
+                          <i class="small material-icons">picture_as_pdf</i>
+                         </a>
+                </div>
+            </div>
+
             {% endif %}
         </div>
 
