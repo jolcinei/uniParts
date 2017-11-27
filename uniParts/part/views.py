@@ -12,10 +12,18 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
     if tipo == None:
         tipo = "todas"
     query = request.GET.get("busca", '')
+    global parte
+    setorP = SetorParte.objects.filter(setor=request.user.profile.setor)
     if request.user.is_superuser:
         if query:
             if tipo == "publicadas":
                 parte = Parte.objects.filter(descricao__icontains=query, status__icontains='PUBLICADO')
+            elif tipo == "outros":
+                if not setorP:
+                    pass
+                else:
+                   for p in setorP:
+                       parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query)
             elif tipo != "todas":
                 parte = Parte.objects.filter(descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
@@ -23,6 +31,12 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
         else:
             if tipo == "publicadas":
                 parte = Parte.objects.filter(status__icontains='PUBLICADO')
+            elif tipo == "outros":
+                if not setorP:
+                    pass
+                else:
+                   for p in setorP:
+                       parte = Parte.objects.filter(pk=p.parte.pk)
             elif tipo != "todas":
                 parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo).exclude(
                     status__icontains='PUBLICADO')
@@ -31,15 +45,26 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
     else:
         if query:
             if tipo == "publicadas":
-                parte = Parte.objects.filter(descricao__icontains=query, status__icontains='PUBLICADO')
+                parte = Parte.objects.filter(author=request.user, descricao__icontains=query, status__icontains='PUBLICADO')
+            elif tipo == "outros":
+                if not setorP:
+                    pass
+                else:
+                    for p in setorP:
+                        parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query)
             elif tipo != "todas":
-                parte = Parte.objects.filter(author=request.user, descricao__icontains=query,
-                                             tipoParte__tpDescricao__icontains=tipo)
+                parte = Parte.objects.filter(author=request.user, descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
                 parte = Parte.objects.filter(author=request.user, descricao__icontains=query)
         else:
             if tipo == "publicadas":
                 parte = Parte.objects.filter(author=request.user, status__contains='PUBLICADO')
+            elif tipo == "outros":
+                if not setorP:
+                    pass
+                else:
+                    for p in setorP:
+                        parte = Parte.objects.filter(pk=p.parte.pk)
             elif tipo != "todas":
                 if request.user.is_anonymous:
                     parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo)
@@ -52,7 +77,8 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                 else:
                     parte = Parte.objects.filter(author=request.user)
     validacao = Validacao.objects.select_related('parte')
-    contexto = {'lista': parte, 'validations': validacao}
+    setor = SetorParte.objects.select_related('parte')
+    contexto = {'lista': parte, 'validations': validacao, 'setores' : setor}
     return render(request, template_name, contexto)
 
 
@@ -174,7 +200,8 @@ def exportToPdf(request, pk):
         p.drawString(300, yyy, l)
         yyy -=15
     p.setFont('Courier-Bold', 12)
-    p.drawString(350, yyy, 'Solicitante')
+    profile = Profile.objects.get(user=par.author)
+    p.drawString(350, yyy, 'RG: ' + profile.rg)
     p.showPage()
     validacoes = Validacao.objects.select_related('parte')
     yyyy = 650
@@ -209,3 +236,29 @@ def negado(request, pk):
     validacao.save()
     parte.save()
     return redirect('/partes/listar/todas/')
+
+def encaminhar_parte(request, pk):
+    par = get_object_or_404(Parte, pk=pk)
+    if request.method == "POST":
+        form = SetorParteForm(request.POST, pk)
+        if form.is_valid():
+            sp = form.save(commit=False)
+            setorP = SetorParte.objects.filter(parte=par)
+            usuario = request.user
+            profile = Profile.objects.get(user=usuario)
+            if not setorP:
+                sp.parte = par
+                sp.setor = form.cleaned_data['setor']
+                sp.data_enc = timezone.now()
+                sp.observacao = 'Encaminhado ao setor ' + sp.setor.__str__() + ' Por: '+ profile.graduacao + ' ' + usuario.get_full_name()
+                sp.save()
+            else:
+                for setorParte in setorP:
+                    setorParte.setor = form.cleaned_data['setor']
+                    setorParte.data_enc = timezone.now()
+                    setorParte.observacao = 'Encaminhado ao setor '+ setorParte.setor.__str__() + ' Por: '+ profile.graduacao + ' ' + usuario.get_full_name()
+                    setorParte.save()
+            return redirect('/partes/listar/todas/')
+    else:
+        form = SetorParteForm()
+    return render(request, 'validacao_edit.html', {'form': form})

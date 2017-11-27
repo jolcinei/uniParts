@@ -7,6 +7,7 @@ class ParteModelAdmin(admin.ModelAdmin):
     list_display = ('descricao','author','status','data_inicio','data_fim')
     search_fields = ('descricao','tipoParte','data_criacao')
     list_filter = ('status','tipoParte','data_criacao')
+    actions = None
   #  readonly_fields = ('status')
 
 
@@ -16,3 +17,4 @@ admin.site.register(Validacao)
 admin.site.register(Alerta)
 admin.site.register(NivelAutorizacao)
 admin.site.register(Profile)
+admin.site.register(Setor)

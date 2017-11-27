@@ -26,8 +26,6 @@ Lista de Partes
     <div class="col s8">
         <div class="card-panel grey lighten-5">
             <a href="/admin/part/parte/{{parte.pk}}">
-               <!-- <img src="{{hora.foto.url}}" style="width:100%"> -->
-
                    <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}}</p>
                    <p>Solicitante: {{parte.author.get_full_name}}</p>
                    <p>{{parte.descricao}}</p>
@@ -44,7 +42,7 @@ Lista de Partes
                 {% endif %}
 
             </a>
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user != parte.author %}
 
             <div class="container">
                 {% if parte.boletim_interno is None %}
@@ -66,7 +64,7 @@ Lista de Partes
                     </div>
                   {% endif %}
             <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
-                         <a href="!#">
+                         <a href="{% url 'encaminhar_parte' pk=parte.pk %}">
                           <i class="small material-icons">send</i>
                          </a>
             </div>
@@ -91,6 +89,15 @@ Lista de Partes
                             <a href="/admin/part/validacao/{{validacao.pk}}">
                                 <li>{{ validacao.observacao }}</li>
                             </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for setor in setores %}
+                {% if setor.parte.pk == parte.pk %}
+                    <div>
+                        <div>
+                            <li>{{ setor.observacao }}</li>
                         </div>
                     </div>
                 {% endif %}
