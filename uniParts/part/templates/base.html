@@ -30,7 +30,7 @@
                   Bem vindo(a), {{ user.first_name }} - {{ user.profile.setor }}.
                     </div>
                  <div class="col s1">
-                        <a href="/admin/logout/">
+                        <a href="/admin/logout/?next=http://127.0.0.1:8000/">
                           <i class="material-icons right">directions_run</i>
                            Sair
                         </a>
@@ -40,7 +40,7 @@
                      Bem vindo(a), usuário. Por favor faça o login no sistema.
                  </div>
                   <div class="col s1">
-                      <a href="/admin/login/">
+                      <a href="/admin/login/?next={{request.path}}">
                            <i class="material-icons right">fingerprint</i>
                            Logar
                       </a>

@@ -13,7 +13,10 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
         tipo = "todas"
     query = request.GET.get("busca", '')
     global parte
-    setorP = SetorParte.objects.filter(setor=request.user.profile.setor)
+    if request.user.is_anonymous:
+        pass
+    else:
+        setorP = SetorParte.objects.filter(setor=request.user.profile.setor)
     if request.user.is_superuser:
         if query:
             if tipo == "publicadas":
@@ -23,7 +26,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                    for p in setorP:
-                       parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query)
+                       parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None)
             elif tipo != "todas":
                 parte = Parte.objects.filter(descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
@@ -36,7 +39,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                    for p in setorP:
-                       parte = Parte.objects.filter(pk=p.parte.pk)
+                       parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None)
             elif tipo != "todas":
                 parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo).exclude(
                     status__icontains='PUBLICADO')
@@ -51,7 +54,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                     for p in setorP:
-                        parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query)
+                        parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None)
             elif tipo != "todas":
                 parte = Parte.objects.filter(author=request.user, descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
@@ -64,7 +67,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                     for p in setorP:
-                        parte = Parte.objects.filter(pk=p.parte.pk)
+                        parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None)
             elif tipo != "todas":
                 if request.user.is_anonymous:
                     parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo)
@@ -97,6 +100,7 @@ def parte_new(request):
                 ale.descricao = 'Novo atestado do ' + usuario.first_name
                 ale.data_alerta = timezone.now()
                 ale.save()
+            encaminhar_parte_novo(parte.pk)
             return redirect('/partes/listar/todas/')
     else:
         form = ParteForm()
@@ -193,7 +197,7 @@ def exportToPdf(request, pk):
     dia_fim = par.data_fim.strftime('%d')
     mes_fim = par.data_fim.month - 1
     ano_fim = par.data_fim.strftime('%Y')
-    p.drawString(20,y, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
+    p.drawString(20,y-30, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
     # Nome do solicitante
     yyy = 240
     for l in wrap(nombre, 40):
@@ -201,7 +205,8 @@ def exportToPdf(request, pk):
         yyy -=15
     p.setFont('Courier-Bold', 12)
     profile = Profile.objects.get(user=par.author)
-    p.drawString(350, yyy, 'RG: ' + profile.rg)
+    p.drawString(355,yyy, 'Solicitante')
+    p.drawString(350,yyy-15, 'RG: ' + profile.rg)
     p.showPage()
     validacoes = Validacao.objects.select_related('parte')
     yyyy = 650
@@ -262,3 +267,14 @@ def encaminhar_parte(request, pk):
     else:
         form = SetorParteForm()
     return render(request, 'validacao_edit.html', {'form': form})
+
+def encaminhar_parte_novo(pk):
+    par = get_object_or_404(Parte, pk=pk)
+    profile = Profile.objects.get(user=par.author)
+    sp = SetorParte()
+    sp.parte = par
+    sp.setor = profile.setor
+    sp.data_enc = timezone.now()
+    sp.observacao = 'Encaminhado ao setor ' + sp.setor.__str__() + ' Por: '+ profile.graduacao + ' ' + par.author.get_full_name()
+    sp.save()
+

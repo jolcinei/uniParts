@@ -25,82 +25,84 @@ Lista de Partes
     {% for parte in lista %}
     <div class="col s8">
         <div class="card-panel grey lighten-5">
-            <a href="/admin/part/parte/{{parte.pk}}">
-                   <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}}</p>
-                   <p>Solicitante: {{parte.author.get_full_name}}</p>
-                   <p>{{parte.descricao}}</p>
-                    <div class="card-content green-text">
-                        <p>Data inicio: {{parte.data_inicio}}</p>
-                        <p>Data fim: {{parte.data_fim}}</p>
-                    </div>
-                   <p>Data de criação: {{parte.data_criacao}}</p>
-                {% if parte.boletim_interno is not None %}
-                    <div class="card-content yellow-text">
-                        <p>Boletim Interno: {{parte.boletim_interno}}</p>
-                        <p>Data de publicação: {{parte.data_publicacao}}</p>
-                    </div>
-                {% endif %}
+            <!-- <a href="/admin/part/parte/{{parte.pk}}">-->
+            <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}} - {{parte.tipoParte}}</p>
+            <p>Solicitante: {{parte.author.get_full_name}}</p>
+            <p>{{parte.descricao}}</p>
+            <div class="card-content green-text">
+                <p>Data inicio: {{parte.data_inicio}}</p>
+                <p>Data fim: {{parte.data_fim}}</p>
+            </div>
+            <p>Data de criação: {{parte.data_criacao}}</p>
+            {% if parte.boletim_interno is not None %}
+            <div class="card-content red-text">
+                <p>Boletim Interno: {{parte.boletim_interno}}</p>
+                <p>Data de publicação: {{parte.data_publicacao}}</p>
+            </div>
+            {% endif %}
 
-            </a>
-            {% if user.is_authenticated and user != parte.author %}
+            <!--  </a>-->
+
 
             <div class="container">
+                {% if user.is_authenticated and user != parte.author %}
                 {% if parte.boletim_interno is None %}
-            <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
-                         <a href="{% url 'validacao_new' pk=parte.pk %}">
-                          <i class="small material-icons">gavel</i>
-                         </a>
-            </div>
-            <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
-                         <a href="{% url 'negado' pk=parte.pk %}">
-                          <i class="small material-icons">block</i>
-                         </a>
-            </div>
-                 {% if parte.status == 'AUTORIZADO' %}
-                    <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
-                         <a href="{% url 'parte_edit' pk=parte.pk %}">
-                          <i class="small material-icons">event_available</i>
-                         </a>
-                    </div>
-                  {% endif %}
-            <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
-                         <a href="{% url 'encaminhar_parte' pk=parte.pk %}">
-                          <i class="small material-icons">send</i>
-                         </a>
-            </div>
+                <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
+                    <a href="{% url 'validacao_new' pk=parte.pk %}">
+                        <i class="small material-icons">gavel</i>
+                    </a>
+                </div>
+                <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
+                    <a href="{% url 'negado' pk=parte.pk %}">
+                        <i class="small material-icons">block</i>
+                    </a>
+                </div>
+                {% if parte.status == 'AUTORIZADO' %}
+                <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
+                    <a href="{% url 'parte_edit' pk=parte.pk %}">
+                        <i class="small material-icons">event_available</i>
+                    </a>
+                </div>
+                {% endif %}
+                <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
+                    <a href="{% url 'encaminhar_parte' pk=parte.pk %}">
+                        <i class="small material-icons">send</i>
+                    </a>
+                </div>
                 {% endif %}
                 <div class="center btn-floating waves-effect waves-light gray z-depth-2 ">
-                         <a href="{% url 'exportToPdf' pk=parte.pk %}">
-                          <i class="small material-icons">picture_as_pdf</i>
-                         </a>
+                    <a href="{% url 'exportToPdf' pk=parte.pk %}">
+                        <i class="small material-icons">picture_as_pdf</i>
+                    </a>
                 </div>
+                {% endif %}
             </div>
 
-            {% endif %}
+
         </div>
 
     </div>
     <div class="col s4">
         <div class="card-panel lime accent-2">
             {% for validacao in validations %}
-                {% if validacao.parte.pk == parte.pk %}
-                    <div>
-                        <div>
-                            <a href="/admin/part/validacao/{{validacao.pk}}">
-                                <li>{{ validacao.observacao }}</li>
-                            </a>
-                        </div>
-                    </div>
-                {% endif %}
+            {% if validacao.parte.pk == parte.pk %}
+            <div>
+                <div  style="color: navy;">
+                    <!--<a href="/admin/part/validacao/{{validacao.pk}}"> -->
+                        <li>{{ validacao.observacao }}</li>
+                    <!--</a>-->
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
             {% for setor in setores %}
-                {% if setor.parte.pk == parte.pk %}
-                    <div>
-                        <div>
-                            <li>{{ setor.observacao }}</li>
-                        </div>
-                    </div>
-                {% endif %}
+            {% if setor.parte.pk == parte.pk %}
+            <div>
+                <div style="color: Tomato;">
+                    <li>{{ setor.observacao }}</li>
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
