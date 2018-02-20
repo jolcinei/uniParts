@@ -26,7 +26,8 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                    for p in setorP:
-                       parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None)
+                       parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None).exclude(
+                        status__icontains='PUBLICADO')
             elif tipo != "todas":
                 parte = Parte.objects.filter(descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
@@ -39,7 +40,8 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                    for p in setorP:
-                       parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None)
+                       parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None).exclude(
+                        status__icontains='PUBLICADO')
             elif tipo != "todas":
                 parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo).exclude(
                     status__icontains='PUBLICADO')
@@ -54,7 +56,8 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                     for p in setorP:
-                        parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None)
+                        parte = Parte.objects.filter(pk=p.parte.pk,descricao__icontains=query,boletim_interno=None).exclude(
+                        status__icontains='PUBLICADO')
             elif tipo != "todas":
                 parte = Parte.objects.filter(author=request.user, descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
@@ -67,7 +70,8 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     pass
                 else:
                     for p in setorP:
-                        parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None)
+                        parte = Parte.objects.filter(pk=p.parte.pk,boletim_interno=None).exclude(
+                        status__icontains='PUBLICADO')
             elif tipo != "todas":
                 if request.user.is_anonymous:
                     parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo)
@@ -282,5 +286,11 @@ def encaminhar_parte_novo(pk):
     sp.save()
 
 def total_alertas_nao_lidos():
-    atestados = Alerta.objects.all()
+    atestados = Alerta.objects.filter().exclude(lido=True)
     return atestados
+
+def alerta_lido(request, pk):
+    alerta = get_object_or_404(Alerta, pk=pk)
+    alerta.lido = True
+    alerta.save()
+    return redirect('/partes/listar/todas/')

@@ -11,4 +11,5 @@ urlpatterns= [
     url(r'^exportToPdf/(?P<pk>\d+)/$', exportToPdf, name='exportToPdf'),
     url(r'^negado/(?P<pk>\d+)/$', negado, name='negado'),
     url(r'^$', parts_list, name='parts_list'),
+    url(r'^lido/(?P<pk>\d+)/$', alerta_lido, name='alerta_lido'),
 ]

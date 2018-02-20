@@ -128,9 +128,16 @@ left:70%;
  <div id="welcomeDiv" class="div-alert">
                 {% for alert in alerta %}
                 <div class="alert">
-                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                {{ alert.descricao }}
-                {{ alert.data_alerta }}
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">
+                        <div class="center btn-floating waves-effect waves-light green">
+                            <a href="{% url 'alerta_lido' pk=alert.pk %}">
+                                <i class="tiny material-icons">check</i>
+                            </a>
+                        </div>
+                    </span>
+                    {{ alert.descricao }}
+                    {{ alert.data_alerta }}
+
                 </div>
                 {% endfor %}
 
