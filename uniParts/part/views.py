@@ -79,9 +79,10 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                     parte = Parte.objects.all()
                 else:
                     parte = Parte.objects.filter(author=request.user)
+    alerta = total_alertas_nao_lidos()
     validacao = Validacao.objects.select_related('parte')
     setor = SetorParte.objects.select_related('parte')
-    contexto = {'lista': parte, 'validations': validacao, 'setores' : setor}
+    contexto = {'lista': parte, 'validations': validacao, 'setores' : setor, 'alerta' : alerta}
     return render(request, template_name, contexto)
 
 
@@ -97,7 +98,7 @@ def parte_new(request):
             parte.save()
             if 'Atestado' in parte.tipoParte.tpDescricao:
                 ale = Alerta()
-                ale.descricao = 'Novo atestado do ' + usuario.first_name
+                ale.descricao = 'Novo atestado de ' + usuario.get_full_name()
                 ale.data_alerta = timezone.now()
                 ale.save()
             encaminhar_parte_novo(parte.pk)
@@ -162,9 +163,11 @@ def exportToPdf(request, pk):
     p = canvas.Canvas(response, pagesize=A4)
     p.setFont('Courier', 12)
     # Cabeçalho lado esquerdo
+    local = par.author.profile.setor
     p.drawString(20, 800, 'PMPR')
     p.drawString(20, 785, '5º CRPM')
     p.drawString(20, 770, '6º BPM')
+    p.drawString(20, 755, str(local))
     # Cabeçalho lado direito
     Meses = ('Jan', 'Fev.', 'Mar.', 'Abr.', 'Maio', 'Jun.',
     'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.')
@@ -278,3 +281,6 @@ def encaminhar_parte_novo(pk):
     sp.observacao = 'Encaminhado ao setor ' + sp.setor.__str__() + ' Por: '+ profile.graduacao + ' ' + par.author.get_full_name()
     sp.save()
 
+def total_alertas_nao_lidos():
+    atestados = Alerta.objects.all()
+    return atestados

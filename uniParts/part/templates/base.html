@@ -16,72 +16,134 @@
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
     <script>
-    $(document).ready(function() {
-      $('.datepicker').datepicker({ dateFormat: 'dd/mm/yy' });
-    });
+        $(document).ready(function() {
+             $('.datepicker').datepicker({ dateFormat: 'dd/mm/yy' });
+        });
+        function showDiv() {
+            if(document.getElementById('welcomeDiv').style.display == "block")
+                document.getElementById('welcomeDiv').style.display = "none";
+            else
+                document.getElementById('welcomeDiv').style.display = "block";
+        }
     </script>
+    <style>
+    /* The alert message box */
+.alert {
+    padding: 20px;
+    background-color: #f44336; /* Red */
+    color: white;
+    margin-bottom: 15px;
+}
+        /* The close button */
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+    color: black;
+}
+.div-alert{
+display:none; width:250px;
+height:100px;
+overflow:auto;
+position:absolute;
+background:#dcedc8;
+z-index:100;
+top:10%;
+left:70%;
+}
+    </style>
     {% load material_form material_form_internal %}
 </head>
 <body>
 <nav>
-        <div class="row">
-                {% if user.is_authenticated %}
-                <div class="col s11">
-                  Bem vindo(a), {{ user.first_name }} - {{ user.profile.setor }}.
-                    </div>
-                 <div class="col s1">
-                        <a href="/admin/logout/?next=http://127.0.0.1:8000/">
-                          <i class="material-icons right">directions_run</i>
-                           Sair
-                        </a>
-                </div>
-                {% else %}
-                 <div class="col s11">
-                     Bem vindo(a), usuário. Por favor faça o login no sistema.
-                 </div>
-                  <div class="col s1">
-                      <a href="/admin/login/?next={{request.path}}">
-                           <i class="material-icons right">fingerprint</i>
-                           Logar
-                      </a>
-                  </div>
-                {% endif %}
-         </div>
-    </nav>
-    {% if user.is_authenticated %}
     <div class="row">
-        <div class="container">
-            <p class="col s2"><a href="{% url 'parts_list' tipo='todas'%}">Todas</a></p>
-            <p class="col s2"><a href="{% url 'parts_list' tipo='atestado'%}">Atestado</a></p>
-            <p class="col s2"><a href="{% url 'parts_list' tipo='férias'%}">Férias</a></p>
-            <p class="col s2"><a href="{% url 'parts_list' tipo='deslocamento'%}">Deslocamento</a></p>
-            <p class="col s2"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
-            <p class="col s2"><a href="{% url 'parts_list' tipo='publicadas'%}">Publicadas</a></p>
+        {% if user.is_authenticated %}
+        <div class="col s10">
+            Bem vindo(a), {{ user.first_name }} - {{ user.profile.setor }}.
         </div>
 
-    </div>
-    {% endif %}
-    <div class="fixed-action-btn">
-    {% if user.is_authenticated %}
-            <a href="{% url 'parte_new' %}" class="btn-floating btn-large waves-effect waves-light red z-depth-2">
-                <i class="large material-icons">add</i>
+        <div class="col s1">
+            {% if user.profile.setor.P1 == 'P1' %}
+            <div>
+            <a onclick="showDiv()">
+                <span class="new badge red">{{ alerta|length }}</span>
+                <i class="large material-icons">menu</i>>
             </a>
-    {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="col s1">
+            <a href="/admin/logout/?next=http://127.0.0.1:80/">
+                <i class="material-icons right">directions_run</i>
+                Sair
+            </a>
+        </div>
+        {% else %}
+        <div class="col s11">
+            Bem vindo(a), usuário. Por favor faça o login no sistema.
+        </div>
+        <div class="col s1">
+            <a href="/admin/login/?next={{request.path}}">
+                <i class="material-icons right">fingerprint</i>
+                Logar
+            </a>
+        </div>
+        {% endif %}
     </div>
+</nav>
 {% if user.is_authenticated %}
+<div class="row">
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        <p class="col s2"><a href="{% url 'parts_list' tipo='todas'%}">Todas</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='atestado'%}">Atestado</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='férias'%}">Férias</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='deslocamento'%}">Deslocamento</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='publicadas'%}">Publicadas</a></p>
     </div>
+
+</div>
+{% endif %}
+<div class="fixed-action-btn">
+    {% if user.is_authenticated %}
+    <a href="{% url 'parte_new' %}" class="btn-floating btn-large waves-effect waves-light red z-depth-2">
+        <i class="large material-icons">add</i>
+    </a>
+    {% endif %}
+</div>
+{% if user.is_authenticated %}
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+ <div id="welcomeDiv" class="div-alert">
+                {% for alert in alerta %}
+                <div class="alert">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                {{ alert.descricao }}
+                {{ alert.data_alerta }}
+                </div>
+                {% endfor %}
+
+ </div>
 {% endif %}
 </body>
-<!--
+
 <footer class="page-footer">
           <div class="container">
             <div class="row">
               <div class="col l6 s12">
                 <h5 class="white-text">Conteúdo</h5>
-                <p class="grey-text text-lighten-4">Este site busca a desburrocratização do envio de partes para o ambito do 6º BPM</p>
+                <p class="grey-text text-lighten-4">Este projeto busca a desburrocratização do envio de partes para o ambito do 6º BPM</p>
               </div>
               <div class="col l4 offset-l2 s12">
                 <h5 class="white-text">Links</h5>
@@ -94,9 +156,9 @@
           </div>
           <div class="footer-copyright">
             <div class="container">
-            © 2017 Copyright Text
+            © 2018 Copyright Text
             </div>
           </div>
         </footer>
--->
+
 </html>
