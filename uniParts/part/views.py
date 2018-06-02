@@ -186,7 +186,7 @@ def exportToPdf(request, pk):
     p.drawString(xx, 785, 'Parte nº ' + numero)
     nome = str(par.author.get_full_name())
     nombre = []
-    nombre.append('Do Sd. QPM 1-0 ')
+    nombre.append('Do '+par.author.profile.graduacao)
     nombre.append(nome)
     nombre = ''.join(nombre)
     for n in wrap(nombre,25):
@@ -217,22 +217,34 @@ def exportToPdf(request, pk):
     p.showPage()
     validacoes = Validacao.objects.select_related('parte')
     yyyy = 650
+    zzz = 30
+    qtd = 0
     for v in validacoes:
         if v.parte == par:
+            qtd += 1
             p.setFont('Courier', 12)
             # Cabeçalho lado esquerdo
-            p.drawString(20, 800, 'PMPR')
-            p.drawString(20, 785, '5º CRPM')
-            p.drawString(20, 770, '6º BPM')
-
+            p.drawString(zzz, yyyy+150, 'PMPR')
+            p.drawString(zzz, yyyy+135, '5º CRPM')
+            p.drawString(zzz, yyyy+120, '6º BPM')
 
             for line in wrap(v.observacao, 30):
-                p.drawString(20, yyyy, line)
+                p.drawString(zzz, yyyy, line)
                 yyyy -= 15
 
             if v.user_validacao != None:
-                p.drawString(45,yyyy-45,v.user_validacao.get_full_name())
-            p.showPage()
+                yyyy -= 45
+                p.drawString(zzz,yyyy,v.user_validacao.profile.graduacao+' '+v.user_validacao.get_full_name())
+            yyyy -= 200
+
+            if qtd == 2:
+                zzz += 300
+                yyyy = 650
+            if qtd == 4:
+                p.showPage()
+                yyyy = 650
+                zzz = 30
+                qtd = 0
     p.save()
     return response
 

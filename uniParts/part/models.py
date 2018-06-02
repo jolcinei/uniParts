@@ -133,15 +133,15 @@ class Validacao(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile')
-    SOLDADO = 'Sd.'
-    CABO = 'Cb.'
-    SARGENTO = 'Sgt.'
-    SUBTENENTE = 'SubTen.'
-    TENENTE = 'Ten.'
-    CAPITAO = 'Cap.'
-    MAJOR = 'Maj.'
-    TEN_CORONEL = 'Ten.-Cel'
-    CORONEL = 'Cel.'
+    SOLDADO = 'Sd. QPM 1-0'
+    CABO = 'Cb. QPM 1-0'
+    SARGENTO = 'Sgt. QPM 1-0'
+    SUBTENENTE = 'SubTen. QPM 1-0'
+    TENENTE = 'Ten. QOPM'
+    CAPITAO = 'Cap. QOPM'
+    MAJOR = 'Maj. QOPM'
+    TEN_CORONEL = 'Ten.-Cel. QOPM'
+    CORONEL = 'Cel. QOPM'
     HIERARQUIA = (
         (SOLDADO, 'SOLDADO'),
         (CABO, 'CABO'),
