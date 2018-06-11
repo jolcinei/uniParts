@@ -162,7 +162,7 @@ def validacao_new(request, pk):
 def exportToPdf(request, pk):
     par = get_object_or_404(Parte, pk=pk)
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="partes.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="parte_'+str(par.id)+'.pdf"'
 
     p = canvas.Canvas(response, pagesize=A4)
     p.setFont('Courier', 12)
@@ -215,7 +215,7 @@ def exportToPdf(request, pk):
     p.drawString(355,yyy, 'Solicitante')
     p.drawString(350,yyy-15, 'RG: ' + profile.rg)
     p.showPage()
-    validacoes = Validacao.objects.select_related('parte')
+    validacoes = Validacao.objects.select_related('parte').order_by('data_autorizacao')
     yyyy = 650
     zzz = 30
     qtd = 0
@@ -227,6 +227,11 @@ def exportToPdf(request, pk):
             p.drawString(zzz, yyyy+150, 'PMPR')
             p.drawString(zzz, yyyy+135, '5º CRPM')
             p.drawString(zzz, yyyy+120, '6º BPM')
+
+            dia_v = v.data_autorizacao.strftime('%d')
+            mes_v = v.data_autorizacao.month - 1
+            ano_v = v.data_autorizacao.strftime('%Y')
+            p.drawString(zzz, yyyy+15,'Ciente em: '+ dia_v + ' ' + Meses[mes_v] + ' ' + ano_v)
 
             for line in wrap(v.observacao, 30):
                 p.drawString(zzz, yyyy, line)
