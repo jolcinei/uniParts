@@ -1,6 +1,5 @@
 from textwrap import wrap
 from django.shortcuts import render, get_object_or_404
-from .models import *
 from django.shortcuts import redirect
 from .forms import *
 from reportlab.pdfgen import canvas
@@ -12,6 +11,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
     if tipo == None:
         tipo = "todas"
     query = request.GET.get("busca", '')
+    global setorP
     global parte
     if request.user.is_anonymous:
         pass
@@ -50,7 +50,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
     else:
         if query:
             if tipo == "publicadas":
-                parte = Parte.objects.filter(author=request.user, descricao__icontains=query, status__icontains='PUBLICADO')
+                parte = Parte.objects.filter(descricao__icontains=query, status__icontains='PUBLICADO')
             elif tipo == "outros":
                 if not setorP:
                     pass
@@ -64,7 +64,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                 parte = Parte.objects.filter(author=request.user, descricao__icontains=query)
         else:
             if tipo == "publicadas":
-                parte = Parte.objects.filter(author=request.user, status__contains='PUBLICADO')
+                parte = Parte.objects.filter(status__contains='PUBLICADO')
             elif tipo == "outros":
                 if not setorP:
                     pass
@@ -135,7 +135,7 @@ def validacao_new(request, pk):
             validacao.parte = par
             validacao.data_autorizacao = timezone.now()
             usuario = request.user
-            validacao.observacao = validacao.observacao + ' Por: '+ usuario.first_name
+            validacao.observacao = validacao.observacao
             validacao.user_validacao = usuario
             validacao.save()
             validacoes = Validacao.objects.select_related('parte')
@@ -198,13 +198,13 @@ def exportToPdf(request, pk):
     for line in wrap(par.descricao, 75):
         p.drawString(20, y, line)
         y -= 15
-    dia_inicio = par.data_inicio.strftime('%d')
-    mes_inicio = par.data_inicio.month-1
-    ano_inicio = par.data_inicio.strftime('%Y')
-    dia_fim = par.data_fim.strftime('%d')
-    mes_fim = par.data_fim.month - 1
-    ano_fim = par.data_fim.strftime('%Y')
-    p.drawString(20,y-30, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
+#    dia_inicio = par.data_inicio.strftime('%d')
+#    mes_inicio = par.data_inicio.month-1
+#    ano_inicio = par.data_inicio.strftime('%Y')
+#    dia_fim = par.data_fim.strftime('%d')
+#    mes_fim = par.data_fim.month - 1
+#    ano_fim = par.data_fim.strftime('%Y')
+#    p.drawString(20,y-30, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
     # Nome do solicitante
     yyy = 240
     for l in wrap(nombre, 40):

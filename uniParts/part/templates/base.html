@@ -27,64 +27,80 @@
         }
     </script>
     <style>
-    /* The alert message box */
-.alert {
-    padding: 20px;
-    background-color: #f44336; /* Red */
-    color: white;
-    margin-bottom: 15px;
-}
-        /* The close button */
-.closebtn {
-    margin-left: 15px;
-    color: white;
-    font-weight: bold;
-    float: right;
-    font-size: 22px;
-    line-height: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-}
+            /* The alert message box */
+        .alert {
+            padding: 20px;
+            background-color: #f44336; /* Red */
+            color: white;
+            margin-bottom: 15px;
+        }
+                /* The close button */
+        .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-/* When moving the mouse over the close button */
-.closebtn:hover {
-    color: black;
-}
-.div-alert{
-display:none; width:250px;
-height:100px;
-overflow:auto;
-position:absolute;
-background:#dcedc8;
-z-index:100;
-top:10%;
-left:70%;
-}
+        /* When moving the mouse over the close button */
+        .closebtn:hover {
+            color: black;
+        }
+        .div-alert{
+            display:none; width:250px;
+            height:100px;
+            overflow:auto;
+            position:absolute;
+            background:#dcedc8;
+            z-index:100;
+            top:10%;
+            left:70%;
+        }
     </style>
     {% load material_form material_form_internal %}
+
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script>tinymce.init({
+                selector: 'textarea',
+                setup: function (editor) {
+                    editor.on('submit', function (e) {
+                        editor.save();
+                    });
+                }
+    });
+    </script>
+
 </head>
 <body>
 <nav>
     <div class="row">
         {% if user.is_authenticated %}
-        <div class="col s10">
+        <div class="col s9">
             Bem vindo(a), {{ user.first_name }} - {{ user.profile.setor }}.
         </div>
 
         <div class="col s1">
             {% if user.profile.setor.P1 == 'P1' %}
-            <div>
-            <a onclick="showDiv()">
-                <span class="new badge red">{{ alerta|length }}</span>
-                <i class="large material-icons">menu</i>>
-            </a>
-            </div>
+                <div>
+                    <a onclick="showDiv()">
+                        <span class="new badge red">{{ alerta|length }}</span>
+                        <i class="large material-icons">menu</i>>
+                    </a>
+                </div>
             {% endif %}
         </div>
         <div class="col s1">
-            <a href="/admin/logout/?next=http://127.0.0.1:80/">
+            <a href="/admin/password_change/?next=http://6bpm-server/">
+                <i class="material-icons right">track_changes</i>
+            </a>
+        </div>
+        <div class="col s1">
+            <a href="/admin/logout/?next=http://6bpm-server/">
                 <i class="material-icons right">directions_run</i>
-                Sair
             </a>
         </div>
         {% else %}
@@ -94,7 +110,6 @@ left:70%;
         <div class="col s1">
             <a href="/admin/login/?next={{request.path}}">
                 <i class="material-icons right">fingerprint</i>
-                Logar
             </a>
         </div>
         {% endif %}
@@ -121,31 +136,31 @@ left:70%;
     {% endif %}
 </div>
 {% if user.is_authenticated %}
-<div class="container">
-    {% block content %}
-    {% endblock %}
-</div>
- <div id="welcomeDiv" class="div-alert">
-                {% for alert in alerta %}
-                <div class="alert">
-                    <span class="closebtn" onclick="this.parentElement.style.display='none';">
-                        <div class="center btn-floating waves-effect waves-light green">
-                            <a href="{% url 'alerta_lido' pk=alert.pk %}">
-                                <i class="tiny material-icons">check</i>
-                            </a>
+    <div class="container w-75">
+        {% block content %}
+        {% endblock %}
+    </div>
+     <div id="welcomeDiv" class="div-alert">
+                    {% for alert in alerta %}
+                        <div class="alert">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">
+                                <div class="center btn-floating waves-effect waves-light green">
+                                    <a href="{% url 'alerta_lido' pk=alert.pk %}">
+                                        <i class="tiny material-icons">check</i>
+                                    </a>
+                                </div>
+                            </span>
+                            {{ alert.descricao }}
+                            {{ alert.data_alerta }}
+
                         </div>
-                    </span>
-                    {{ alert.descricao }}
-                    {{ alert.data_alerta }}
+                    {% endfor %}
 
-                </div>
-                {% endfor %}
-
- </div>
+     </div>
 {% endif %}
 </body>
-
-<footer class="page-footer">
+<!--
+    <footer class="page-footer">
           <div class="container">
             <div class="row">
               <div class="col l6 s12">
@@ -163,9 +178,9 @@ left:70%;
           </div>
           <div class="footer-copyright">
             <div class="container">
-            © 2018 Copyright Text
+            © 2018 @jolcinei
             </div>
           </div>
-        </footer>
-
+    </footer>
+-->
 </html>

@@ -5,7 +5,7 @@
     Parte
 {% endblock title %}
 {% block content %}
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Salvar</button>

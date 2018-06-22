@@ -56,6 +56,10 @@ class Setor(models.Model):
     SEGUNDA_CIA = '2ª Cia'
     TERCEIRA_CIA = '3ª Cia'
     QUARTA_CIA = '4ª Cia'
+    CHOQUE = 'Pel. Choque'
+    ROCAM = 'ROCAM'
+    TESOURARIA = 'Tesouraria'
+    OUTROS = 'Outros'
     SETOR = (
         (P1 , 'P1'),
         (P2 , 'P2'),
@@ -69,6 +73,10 @@ class Setor(models.Model):
         (SEGUNDA_CIA , '2ª Cia'),
         (TERCEIRA_CIA , '3ª Cia'),
         (QUARTA_CIA , '4ª Cia'),
+        (CHOQUE, 'Pel. Choque'),
+        (ROCAM, 'ROCAM'),
+        (TESOURARIA, 'Tesouraria'),
+        (OUTROS,'Outros'),
     )
     setor = models.CharField(max_length=32,choices=SETOR)
     def __str__(self):
@@ -92,9 +100,9 @@ class Parte(models.Model):
     )
     status = models.CharField(max_length=32,choices=STATUS)
     author = models.ForeignKey('auth.User')
-    descricao = models.TextField(verbose_name='Descrição',null=False)
-    data_inicio = models.DateField(verbose_name='Data Inicio',null=False)
-    data_fim = models.DateField(verbose_name='Data Fim',null=False)
+    descricao = models.TextField(verbose_name='Descrição')
+#    data_inicio = models.DateField(verbose_name='Data Inicio',null=False)
+#    data_fim = models.DateField(verbose_name='Data Fim',null=False)
     data_criacao = models.DateTimeField(
             default=timezone.now)
 
@@ -102,12 +110,15 @@ class Parte(models.Model):
     upload = models.FileField(null=True,blank=True,verbose_name='Anexo',upload_to='uploads/%Y/%m/%d/')
     boletim_interno = models.CharField(verbose_name='Boletim Interno',max_length=16,null=True,blank=True)
     data_publicacao = models.DateField(verbose_name='Data de Publicação',null=True,blank=True)
-    prejuizo = models.BooleanField(verbose_name='Prejuizo a escala de serviço',default=False)
-    onus = models.BooleanField(verbose_name='Com onus ao estado',default=False)
+#    prejuizo = models.BooleanField(verbose_name='Prejuizo a escala de serviço',default=False)
+#    onus = models.BooleanField(verbose_name='Com onus ao estado',default=False)
     class Meta:
         verbose_name = 'parte'
         verbose_name_plural = 'partes'
         ordering = ["author", "descricao","tipoParte"]
+
+    def authorname(self):
+        return self.author.first_name +" "+ self.author.last_name
 
     def __str__(self):
         return self.descricao
@@ -133,32 +144,53 @@ class Validacao(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile')
+    SOLDADO_2 = 'Sd. PM 2ª Cl.'
     SOLDADO = 'Sd. QPM 1-0'
     CABO = 'Cb. QPM 1-0'
-    SARGENTO = 'Sgt. QPM 1-0'
+    SARGENTO_1 = '1º Sgt. QPM 1-0'
+    SARGENTO_2 = '2º Sgt. QPM 1-0'
+    SARGENTO_3 = '3º Sgt. QPM 1-0'
     SUBTENENTE = 'SubTen. QPM 1-0'
-    TENENTE = 'Ten. QOPM'
+    TENENTE_1 = '1º Ten. QOPM'
+    TENENTE_2 = '2º Ten. QOPM'
+    TENENTE_1E = '1º Ten. QEOPM'
+    TENENTE_2E = '1º Ten. QEOPM'
     CAPITAO = 'Cap. QOPM'
     MAJOR = 'Maj. QOPM'
+    MAJOR_D = 'Maj. QOS - PMDENT'
     TEN_CORONEL = 'Ten.-Cel. QOPM'
     CORONEL = 'Cel. QOPM'
     HIERARQUIA = (
-        (SOLDADO, 'SOLDADO'),
-        (CABO, 'CABO'),
-        (SARGENTO, 'SARGENTO'),
-        (SUBTENENTE, 'SUBTENENTE'),
-        (TENENTE, 'TENENTE'),
-        (CAPITAO, 'CAPITAO'),
-        (MAJOR, 'MAJOR'),
-        (TEN_CORONEL, 'TEN_CORONEL'),
-        (CORONEL, 'CORONEL'),
+        (SOLDADO_2, 'Sd. PM 2ª Cl.'),
+        (SOLDADO, 'Sd. QPM 1-0'),
+        (CABO, 'Cb. QPM 1-0'),
+        (SARGENTO_1, '1º Sgt. QPM 1-0'),
+        (SARGENTO_2, '2º Sgt. QPM 1-0'),
+        (SARGENTO_3, '3º Sgt. QPM 1-0'),
+        (SUBTENENTE, 'SubTen. QPM 1-0'),
+        (TENENTE_1, '1º Ten. QOPM'),
+        (TENENTE_2, '2º Ten. QOPM'),
+        (TENENTE_1E, '1º Ten. QEOPM'),
+        (TENENTE_2E, '2º Ten. QEOPM'),
+        (CAPITAO, 'Cap. QOPM'),
+        (MAJOR, 'Maj. QOPM'),
+        (MAJOR_D, 'Maj. QOS - PMDENT'),
+        (TEN_CORONEL, 'Ten.-Cel. QOPM'),
+        (CORONEL, 'Cel. QOPM'),
     )
     graduacao = models.CharField(max_length=32,choices=HIERARQUIA)
     nivelAutorizacao = models.ForeignKey(NivelAutorizacao)
     rg = models.CharField(max_length=9,null=False)
+    nome_guerra = models.CharField(max_length=128, null=True)
     setor = models.ForeignKey(Setor,blank=True,null=True)
     def __str__(self):
         return self.graduacao +" "+ self.user.first_name
+
+    def __unicode__(self):
+        return self.user.username
+
+    def username(self):
+        return self.user.first_name +" "+ self.user.last_name
 
 class SetorParte(models.Model):
     parte = models.ForeignKey(Parte)

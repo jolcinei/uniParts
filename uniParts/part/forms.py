@@ -1,14 +1,15 @@
 from django import forms
 from .models import *
 
+
 class ParteForm(forms.ModelForm):
     class Meta:
         model = Parte
-        fields = ('tipoParte','upload','descricao','prejuizo','onus','data_inicio','data_fim',)
-        widgets = {
-            'data_inicio': forms.DateInput(attrs={'class':'datepicker'}),
-            'data_fim': forms.DateInput(attrs={'class':'datepicker'}),
-        }
+        fields = ('tipoParte','upload','descricao',)
+#        widgets = {
+#            'data_inicio': forms.DateInput(attrs={'class':'datepicker'}),
+#            'data_fim': forms.DateInput(attrs={'class':'datepicker'}),
+#        }
 
 class ValidacaoForm(forms.ModelForm):
     class Meta:
@@ -27,6 +28,3 @@ class ParteValidacaoForm(forms.ModelForm):
         widgets = {
             'data_publicacao' : forms.DateInput(attrs={'class':'datepicker'},),
         }
-
-
-

@@ -6,7 +6,7 @@
 {% endblock title %}
 {% block content %}
 
-    <form method="POST" class="validacao-form">
+    <form method="POST" class="validacao-form" novalidate>
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Salvar</button>
