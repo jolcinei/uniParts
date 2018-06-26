@@ -59,6 +59,7 @@ class Setor(models.Model):
     CHOQUE = 'Pel. Choque'
     ROCAM = 'ROCAM'
     TESOURARIA = 'Tesouraria'
+    SJD = 'SJD'
     OUTROS = 'Outros'
     SETOR = (
         (P1 , 'P1'),
@@ -76,6 +77,7 @@ class Setor(models.Model):
         (CHOQUE, 'Pel. Choque'),
         (ROCAM, 'ROCAM'),
         (TESOURARIA, 'Tesouraria'),
+        (SJD, 'SJD'),
         (OUTROS,'Outros'),
     )
     setor = models.CharField(max_length=32,choices=SETOR)

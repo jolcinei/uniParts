@@ -122,8 +122,10 @@
         <p class="col s2"><a href="{% url 'parts_list' tipo='atestado'%}">Atestado</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='férias'%}">Férias</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='deslocamento'%}">Deslocamento</a></p>
-        <p class="col s2"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='publicadas'%}">Publicadas</a></p>
+        <p class="col s1"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
+        <p class="col s1"><a href="{% url 'parts_list' tipo='despachos'%}">Despachadas</a></p>
+
     </div>
 
 </div>
