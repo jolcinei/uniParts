@@ -1,8 +1,11 @@
+import os
 from textwrap import wrap
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
 from .forms import *
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4
 from django.http import HttpResponse
 from bs4 import BeautifulSoup
@@ -189,9 +192,13 @@ def exportToPdf(request, pk):
     par = get_object_or_404(Parte, pk=pk)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="parte_'+str(par.id)+'.pdf"'
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    pdfmetrics.registerFont(TTFont("Arial", os.path.join(root_dir, 'fonts','arial.ttf')))
+    pdfmetrics.registerFont(TTFont("Arial-Bold", os.path.join(root_dir, 'fonts', 'arial-bold.ttf')))
 
     p = canvas.Canvas(response, pagesize=A4)
-    p.setFont('Courier', 12)
+    p.setLineWidth(.3)
+    p.setFont('Arial', 12)
     # Cabeçalho lado esquerdo
     local = par.author.profile.setor
     p.drawString(60, 770, 'PMPR')
@@ -223,11 +230,11 @@ def exportToPdf(request, pk):
     yy -=15
     p.drawString(xx, yy, 'Assunto: '+str(par.tipoParte))
     # Texto da parte
-    y = 550
+    yy -= 120
     texto = BeautifulSoup(par.descricao).get_text().split("\n")
     for line in texto:
-        p.drawString(60, y, line)
-        y -= 15
+        p.drawString(60, yy, line)
+        yy -= 15
 #    dia_inicio = par.data_inicio.strftime('%d')
 #    mes_inicio = par.data_inicio.month-1
 #    ano_inicio = par.data_inicio.strftime('%Y')
@@ -236,14 +243,13 @@ def exportToPdf(request, pk):
 #    ano_fim = par.data_fim.strftime('%Y')
 #    p.drawString(20,y-30, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
     # Nome do solicitante
-    yyy = 240
-    for l in wrap(par.author.profile.graduacao+' '+str(par.author.get_full_name()), 40):
-        p.drawString(300, yyy, l)
-        yyy -=15
-    p.setFont('Courier-Bold', 12)
-    profile = Profile.objects.get(user=par.author)
-    p.drawString(355,yyy, 'Solicitante')
-    p.drawString(350,yyy-15, 'RG: ' + profile.rg)
+    yy -= 120
+    for l in wrap(par.author.profile.graduacao+' '+str(par.author.get_full_name()), 35):
+        p.drawString(300, yy, l)
+        yy -=15
+    p.setFont('Arial-Bold', 12)
+    p.drawString(360,yy, 'Solicitante')
+    p.drawString(350,yy-15, 'RG: ' + par.author.profile.rg)
     p.showPage()
     validacoes = Validacao.objects.select_related('parte').order_by('data_autorizacao')
     yyyy = 620
@@ -252,7 +258,7 @@ def exportToPdf(request, pk):
     for v in validacoes:
         if v.parte == par:
             qtd += 1
-            p.setFont('Courier', 12)
+            p.setFont('Arial', 12)
             # Cabeçalho lado esquerdo
             p.drawString(zzz, yyyy+150, 'PMPR')
             p.drawString(zzz, yyyy+135, '5º CRPM')

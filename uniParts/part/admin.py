@@ -7,6 +7,7 @@ class ParteModelAdmin(admin.ModelAdmin):
     list_display = ('descricao','authorname','status')
     search_fields = ('descricao','tipoParte','data_criacao','author__first_name')
     list_filter = ('status','tipoParte','data_criacao','author__first_name')
+    list_per_page = 10
     actions = None
     ordering = ['author__first_name']
 

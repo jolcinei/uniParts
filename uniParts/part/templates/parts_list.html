@@ -27,19 +27,31 @@ Lista de Partes
         <div class="card-panel grey lighten-5">
             <!-- <a href="/admin/part/parte/{{parte.pk}}">-->
             <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}} - {{parte.tipoParte}}</p>
-            <p>Solicitante: {{parte.author.get_full_name}}</p>
+            <p>Solicitante: <b> {{parte.author.profile.graduacao}} {{parte.author.get_full_name}}</b></p>
             <p>RG: {{parte.author.profile.rg}}</p>
             {{parte.descricao|safe}}
             <!--<div class="card-content green-text">
                 <p>Data inicio: {{parte.data_inicio}}</p>
                 <p>Data fim: {{parte.data_fim}}</p>
             </div> -->
+            <div>
+                {% if parte.upload %}
+                   <img src="{{ parte.upload.url }}" class="img-responsive" alt="{{ parte.upload }}" style="text-align:center; width:300px; heigth:200px;" />
+                    <p>
+                        <div class="center btn-floating waves-effect waves-light blue z-depth-2 ">
+                            <a title="Download do Anexo" href="{{ parte.upload.url }}">
+                                <i class="small material-icons">cloud_download</i>
+                            </a>
+                        </div>
+                    </p>
+                {% endif %}
+            </div>
             <p class="card-content green-text">Data de criação: {{parte.data_criacao}}</p>
             {% if parte.boletim_interno != None %}
-            <div class="card-content red-text">
-                <p>Boletim Interno: {{parte.boletim_interno}}</p>
-                <p>Data de publicação: {{parte.data_publicacao}}</p>
-            </div>
+                <div class="card-content red-text">
+                    <p>Boletim Interno: {{parte.boletim_interno}}</p>
+                    <p>Data de publicação: {{parte.data_publicacao}}</p>
+                </div>
             {% endif %}
 
             <!--  </a>-->
@@ -47,36 +59,39 @@ Lista de Partes
 
             <div class="container">
                 {% if user.is_authenticated and user != parte.author %}
-                {% if parte.boletim_interno == None %}
-                <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
-                    <a href="{% url 'validacao_new' pk=parte.pk %}">
-                        <i class="small material-icons">gavel</i>
-                    </a>
-                </div>
-                <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
-                    <a href="{% url 'negado' pk=parte.pk %}">
-                        <i class="small material-icons">block</i>
-                    </a>
-                </div>
-                {% if parte.status == 'AUTORIZADO' %}
-                <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
-                    <a href="{% url 'parte_edit' pk=parte.pk %}">
-                        <i class="small material-icons">event_available</i>
-                    </a>
-                </div>
-                {% endif %}
-                <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
-                    <a href="{% url 'encaminhar_parte' pk=parte.pk %}">
-                        <i class="small material-icons">send</i>
-                    </a>
-                </div>
+                    {% if parte.boletim_interno == None %}
+                        {% if user.profile.nivelAutorizacao.nivel != 'nenhum' %}
+                            <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
+                                <a title="Despachar" href="{% url 'validacao_new' pk=parte.pk %}">
+                                    <i class="small material-icons">gavel</i>
+                                </a>
+                            </div>
+                            <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
+                                <a title="Negar a parte" href="{% url 'negado' pk=parte.pk %}">
+                                    <i class="small material-icons">block</i>
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
+                            <a title="Encaminhar Parte" href="{% url 'encaminhar_parte' pk=parte.pk %}">
+                                <i class="small material-icons">send</i>
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if parte.status == 'AUTORIZADO' %}
+                        <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
+                           <a href="{% url 'parte_edit' pk=parte.pk %}">
+                              <i class="small material-icons">event_available</i>
+                           </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 <div class="center btn-floating waves-effect waves-light gray z-depth-2 ">
-                    <a href="{% url 'exportToPdf' pk=parte.pk %}">
+                    <a title="Exportar para PDF" href="{% url 'exportToPdf' pk=parte.pk %}">
                         <i class="small material-icons">picture_as_pdf</i>
                     </a>
                 </div>
-                {% endif %}
             </div>
 
 

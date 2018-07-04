@@ -51,7 +51,9 @@ class Setor(models.Model):
     P5= 'P5'
     CMD='Cmd'
     SUBCMD = 'SubCmd'
+    PCS = 'PCS'
     ALMOX = 'Almoxarifado'
+    CAVALARIA = 'Cavalaria'
     PRIMEIRA_CIA = '1ª Cia'
     SEGUNDA_CIA = '2ª Cia'
     TERCEIRA_CIA = '3ª Cia'
@@ -62,18 +64,20 @@ class Setor(models.Model):
     SJD = 'SJD'
     OUTROS = 'Outros'
     SETOR = (
-        (P1 , 'P1'),
-        (P2 , 'P2'),
-        (P3 , 'P3'),
-        (P4 , 'P4'),
-        (P5 , 'P5'),
-        (CMD , 'Cmd'),
+        (P1, 'P1'),
+        (P2, 'P2'),
+        (P3, 'P3'),
+        (P4, 'P4'),
+        (P5, 'P5'),
+        (CMD, 'Cmd'),
         (SUBCMD, 'SubCmd'),
-        (ALMOX , 'Almoxarifado'),
-        (PRIMEIRA_CIA , '1ª Cia'),
-        (SEGUNDA_CIA , '2ª Cia'),
-        (TERCEIRA_CIA , '3ª Cia'),
-        (QUARTA_CIA , '4ª Cia'),
+        (PCS, 'PCS'),
+        (ALMOX, 'Almoxarifado'),
+        (CAVALARIA, 'Cavalaria'),
+        (PRIMEIRA_CIA, '1ª Cia'),
+        (SEGUNDA_CIA, '2ª Cia'),
+        (TERCEIRA_CIA, '3ª Cia'),
+        (QUARTA_CIA, '4ª Cia'),
         (CHOQUE, 'Pel. Choque'),
         (ROCAM, 'ROCAM'),
         (TESOURARIA, 'Tesouraria'),

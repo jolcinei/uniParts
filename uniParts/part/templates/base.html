@@ -80,11 +80,11 @@
     <div class="row">
         {% if user.is_authenticated %}
         <div class="col s9">
-            Bem vindo(a), {{ user.first_name }} - {{ user.profile.setor }}.
+            Bem vindo(a), {{ user.profile.nome_guerra }} - {{ user.profile.setor }}.
         </div>
 
         <div class="col s1">
-            {% if user.profile.setor.P1 == 'P1' %}
+            {% if user.profile.setor.setor == 'P1' %}
                 <div>
                     <a onclick="showDiv()">
                         <span class="new badge red">{{ alerta|length }}</span>
@@ -123,8 +123,10 @@
         <p class="col s2"><a href="{% url 'parts_list' tipo='férias'%}">Férias</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='deslocamento'%}">Deslocamento</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='publicadas'%}">Publicadas</a></p>
-        <p class="col s1"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
-        <p class="col s1"><a href="{% url 'parts_list' tipo='despachos'%}">Despachadas</a></p>
+        <p class="col s2"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
+        {% if user.profile.nivelAutorizacao.nivel != 'nenhum' %}
+            <p class="col s2"><a href="{% url 'parts_list' tipo='despachos'%}">Despachadas</a></p>
+        {% endif %}
 
     </div>
 
