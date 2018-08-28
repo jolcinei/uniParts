@@ -4,11 +4,11 @@ from .models import *
 # Register your models here.
 
 class ParteModelAdmin(admin.ModelAdmin):
-    list_display = ('descricao','authorname','status')
+    list_display = ('id','descricao','authorname','status')
     search_fields = ('descricao','tipoParte','data_criacao','author__first_name')
     list_filter = ('status','tipoParte','data_criacao','author__first_name')
     list_per_page = 10
-    actions = None
+    #actions = None
     ordering = ['author__first_name']
 
 

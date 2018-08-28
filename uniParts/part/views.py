@@ -8,8 +8,12 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4
 from django.http import HttpResponse
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import letter
 from bs4 import BeautifulSoup
-
+from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
+from reportlab.lib.styles import ParagraphStyle
 
 def parts_list(request, tipo=None, template_name="parts_list.html"):
     validacoes = Validacao.objects.all()
@@ -224,12 +228,29 @@ def exportToPdf(request, pk):
     nombre = ' '.join(nombre)
     #TODO pegar o chefe do setor.
     for n in wrap(nombre,25):
-        p.drawString(xx, yy,  n.title())
+        p.drawString(xx, yy,  n)
         yy -=15
     p.drawString(xx,yy,'Ao Sr. Cmt. da '+str(local))
     yy -=15
     p.drawString(xx, yy, 'Assunto: '+str(par.tipoParte))
     # Texto da parte
+    printParte(request,pk)
+    style = getSampleStyleSheet()
+    style = ParagraphStyle(name="myStyle", alignment="TA_CENTER",fontName="Arial")
+    text = par.descricao
+#    p = Paragraph(text, style)
+#    used_width, used_height = p.wrap(0, 500)
+#    line_widths = p.getActualLineWidths0()
+#    number_of_lines = len(line_widths)
+#    if number_of_lines > 1:
+#        actual_width = used_width
+#    elif number_of_lines == 1:
+#        actual_width = min(line_widths)
+#        used_width, used_height = p.wrap(actual_width + 0.1, max_height)
+#    else:
+#        return 0, 0
+#    p.drawOn(p, 20, 200 - used_height)
+
     yy -= 120
     texto = BeautifulSoup(par.descricao).get_text().split("\n")
     for line in texto:
@@ -249,7 +270,7 @@ def exportToPdf(request, pk):
         yy -=15
     p.setFont('Arial-Bold', 12)
     p.drawString(360,yy, 'Solicitante')
-    p.drawString(350,yy-15, 'RG: ' + par.author.profile.rg)
+    #p.drawString(350,yy-15, 'RG: ' + par.author.profile.rg)
     p.showPage()
     validacoes = Validacao.objects.select_related('parte').order_by('data_autorizacao')
     yyyy = 620
@@ -287,8 +308,28 @@ def exportToPdf(request, pk):
                 yyyy = 620
                 zzz = 60
                 qtd = 0
+    #p.append(par.upload)
     p.save()
     return response
+
+def printParte(request, pk):
+    par = get_object_or_404(Parte, pk=pk)
+    doc = SimpleDocTemplate("hello_platypus.pdf",
+                            pagesize=letter,
+                            rightMargin=72,
+                            leftMargin=72,
+                            topMargin=72,
+                            bottomMargin=18)
+    styles = getSampleStyleSheet()
+
+    flowables = []
+
+    text = par.descricao
+    para = Paragraph(text, style=styles["Normal"])
+    flowables.append(para)
+
+    doc.build(flowables)
+    return doc
 
 def negado(request, pk):
     parte = get_object_or_404(Parte, pk=pk)

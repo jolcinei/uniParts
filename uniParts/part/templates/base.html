@@ -134,7 +134,7 @@
 {% endif %}
 <div class="fixed-action-btn">
     {% if user.is_authenticated %}
-    <a href="{% url 'parte_new' %}" class="btn-floating btn-large waves-effect waves-light red z-depth-2">
+    <a title="Nova Parte" href="{% url 'parte_new' %}" class="btn-floating btn-large waves-effect waves-light red z-depth-2">
         <i class="large material-icons">add</i>
     </a>
     {% endif %}
