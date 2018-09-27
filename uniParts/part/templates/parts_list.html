@@ -27,6 +27,7 @@ Lista de Partes
         <div class="card-panel grey lighten-5">
             <!-- <a href="/admin/part/parte/{{parte.pk}}">-->
             <p style="background-color:#37474f; text-align:center;color:white;">{{parte.status}} - {{parte.tipoParte}}</p>
+            <p><b>Parte nº: {{parte.id}}</b></p>
             <p>Solicitante: <b> {{parte.author.profile.graduacao}} {{parte.author.get_full_name}}</b></p>
             <p>RG: {{parte.author.profile.rg}}</p>
             {{parte.descricao|safe}}
@@ -59,18 +60,22 @@ Lista de Partes
 
             <div class="container">
                 {% if user.is_authenticated and user != parte.author %}
-                    {% if parte.boletim_interno == None %}
+                    {% if parte.boletim_interno == None or user.profile.setor.setor == 'P1' %}
                         {% if user.profile.nivelAutorizacao.nivel != 'nenhum' %}
-                            <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
-                                <a title="Despachar" href="{% url 'validacao_new' pk=parte.pk %}">
-                                    <i class="small material-icons">gavel</i>
-                                </a>
-                            </div>
+                            {% if parte.status != 'PUBLICADO' %}
+                                <div class="center btn-floating waves-effect waves-light green z-depth-2 ">
+                                    <a title="Despachar" href="{% url 'validacao_new' pk=parte.pk %}">
+                                        <i class="small material-icons">gavel</i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                 <!--
                             <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
                                 <a title="Negar a parte" href="{% url 'negado' pk=parte.pk %}">
                                     <i class="small material-icons">block</i>
                                 </a>
                             </div>
+                            -->
                         {% endif %}
 
                         <div class="right center btn-floating waves-effect waves-light blue z-depth-2 ">
@@ -81,17 +86,25 @@ Lista de Partes
                     {% endif %}
                     {% if parte.status == 'AUTORIZADO' %}
                         <div class="center btn-floating waves-effect waves-light yellow z-depth-2 ">
-                           <a href="{% url 'parte_edit' pk=parte.pk %}">
+                           <a title="Publicar Parte" href="{% url 'parte_edit' pk=parte.pk %}">
                               <i class="small material-icons">event_available</i>
                            </a>
                         </div>
                     {% endif %}
                 {% endif %}
+                {% if parte.status == 'NOVA' %}
+                        <div class="center btn-floating waves-effect waves-light red z-depth-2 ">
+                           <a title="Editar Parte" href="{% url 'editar' pk=parte.pk %}">
+                              <i class="small material-icons">event_available</i>
+                           </a>
+                        </div>
+                    {% endif %}
                 <div class="center btn-floating waves-effect waves-light gray z-depth-2 ">
                     <a title="Exportar para PDF" href="{% url 'exportToPdf' pk=parte.pk %}">
                         <i class="small material-icons">picture_as_pdf</i>
                     </a>
                 </div>
+
             </div>
 
 
@@ -103,10 +116,11 @@ Lista de Partes
             {% for validacao in validations %}
             {% if validacao.parte.pk == parte.pk %}
             <div>
-                <div  style="color: navy;">
+                <div>
                     <!--<a href="/admin/part/validacao/{{validacao.pk}}"> -->
+                    <p style="background-color:#37474f; text-align:center;color:white;">Despacho do {{ validacao.user_validacao.profile.graduacao }} - {{ validacao.user_validacao.profile.nome_guerra }}</p>
                         {{ validacao.observacao | safe}} <br>
-                        {{ validacao.user_validacao.get_full_name }}<br>
+                        <br>
 
                     <!--</a>-->
                 </div>

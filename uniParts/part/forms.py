@@ -14,7 +14,7 @@ class ParteForm(forms.ModelForm):
 class ValidacaoForm(forms.ModelForm):
     class Meta:
         model = Validacao
-        fields = ('observacao',)
+        fields = ('observacao','status',)
 
 class SetorParteForm(forms.ModelForm):
     class Meta:
@@ -28,3 +28,8 @@ class ParteValidacaoForm(forms.ModelForm):
         widgets = {
             'data_publicacao' : forms.DateInput(attrs={'class':'datepicker'},),
         }
+
+class ParteEditarForm(forms.ModelForm):
+    class Meta:
+        model = Parte
+        fields = ('descricao',)

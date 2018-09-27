@@ -67,7 +67,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                 parte = Parte.objects.filter(tipoParte__tpDescricao__icontains=tipo).exclude(
                     status__icontains='PUBLICADO')
             else:
-                parte = Parte.objects.all()
+                parte = Parte.objects.filter(boletim_interno=None)
     else:
         if query:
             if tipo == "publicadas":
@@ -88,7 +88,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
             elif tipo != "todas":
                 parte = Parte.objects.filter(author=request.user, descricao__icontains=query, tipoParte__tpDescricao__icontains=tipo)
             else:
-                parte = Parte.objects.filter(author=request.user, descricao__icontains=query)
+                parte = Parte.objects.filter(author=request.user, descricao__icontains=query, boletim_interno=None)
         else:
             if tipo == "publicadas":
                 parte = Parte.objects.filter(status__contains='PUBLICADO')
@@ -115,7 +115,7 @@ def parts_list(request, tipo=None, template_name="parts_list.html"):
                 if request.user.is_anonymous:
                     parte = Parte.objects.all()
                 else:
-                    parte = Parte.objects.filter(author=request.user)
+                    parte = Parte.objects.filter(author=request.user, boletim_interno=None)
     alerta = total_alertas_nao_lidos()
     validacao = Validacao.objects.select_related('parte')
     setor = SetorParte.objects.select_related('parte')
@@ -158,6 +158,18 @@ def parte_edit(request, pk):
         form = ParteValidacaoForm(instance=parte)
     return render(request, 'parts_edit.html', {'form': form})
 
+def editar(request, pk):
+    parte = get_object_or_404(Parte, pk=pk)
+    if request.method == "POST":
+        form = ParteEditarForm(request.POST, instance=parte)
+        if form.is_valid():
+            parte = form.save(commit=False)
+            parte.save()
+            return redirect('/partes/listar/todas/')
+    else:
+        form = ParteEditarForm(instance=parte)
+    return render(request, 'parts_edit.html', {'form': form})
+
 
 def validacao_new(request, pk):
     par = get_object_or_404(Parte, pk=pk)
@@ -171,21 +183,21 @@ def validacao_new(request, pk):
             validacao.observacao = validacao.observacao
             validacao.user_validacao = usuario
             validacao.save()
-            validacoes = Validacao.objects.select_related('parte')
-            i = 0
-            for v in validacoes:
-                if v.parte == par:
-                    i = i + 1
-            print(i)
-            print(par.tipoParte.qtd_validacoes)
-            if i >= par.tipoParte.qtd_validacoes:
-                par.status = 'AUTORIZADO'
-                print(par.status)
+            if validacao.status == 'INDEFIRO':
+                par.status = 'NEGADO'
                 par.save()
             else:
-                par.status = 'EM_ANALISE'
-                print(par.status)
-                par.save()
+                validacoes = Validacao.objects.select_related('parte')
+                i = 0
+                for v in validacoes:
+                    if v.parte == par:
+                        i = i + 1
+                if i >= par.tipoParte.qtd_validacoes:
+                    par.status = 'AUTORIZADO'
+                    par.save()
+                else:
+                    par.status = 'EM_ANALISE'
+                    par.save()
             return redirect('/partes/listar/todas/')
     else:
         form = ValidacaoForm()
@@ -232,7 +244,10 @@ def exportToPdf(request, pk):
         yy -=15
     p.drawString(xx,yy,'Ao Sr. Cmt. da '+str(local))
     yy -=15
-    p.drawString(xx, yy, 'Assunto: '+str(par.tipoParte))
+
+    for tp in wrap('Assunto: '+str(par.tipoParte),25):
+        p.drawString(xx, yy, tp)
+        yy-=15
     # Texto da parte
     printParte(request,pk)
     style = getSampleStyleSheet()
@@ -252,7 +267,7 @@ def exportToPdf(request, pk):
 #    p.drawOn(p, 20, 200 - used_height)
 
     yy -= 120
-    texto = BeautifulSoup(par.descricao).get_text().split("\n")
+    texto = BeautifulSoup(par.descricao, "html.parser").get_text().split("\n")
     for line in texto:
         p.drawString(60, yy, line)
         yy -= 15
@@ -265,7 +280,7 @@ def exportToPdf(request, pk):
 #    p.drawString(20,y-30, 'No período de '+dia_inicio+' '+Meses[mes_inicio]+' '+ano_inicio+ ' até o dia '+dia_fim+' '+Meses[mes_fim]+' '+ano_fim+'.')
     # Nome do solicitante
     yy -= 120
-    for l in wrap(par.author.profile.graduacao+' '+str(par.author.get_full_name()), 35):
+    for l in wrap(par.author.profile.graduacao+' '+str(par.author.get_full_name()), 45):
         p.drawString(300, yy, l)
         yy -=15
     p.setFont('Arial-Bold', 12)
@@ -336,7 +351,7 @@ def negado(request, pk):
     parte.status = 'NEGADO'
     usuario = request.user
     validacao = Validacao()
-    validacao.observacao = 'Negado por ' + usuario.first_name + ' em pré analise.'
+    validacao.observacao = 'Negado por ' + usuario.profile.graduacao + ' ' + usuario.profile.nome_guerra + ' em pré analise.'
     validacao.data_autorizacao = timezone.now()
     validacao.user_validacao = usuario
     validacao.parte = parte

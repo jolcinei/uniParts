@@ -63,6 +63,7 @@ class Setor(models.Model):
     TESOURARIA = 'Tesouraria'
     SJD = 'SJD'
     OUTROS = 'Outros'
+    ARQUIVO = 'Arquivo'
     SETOR = (
         (P1, 'P1'),
         (P2, 'P2'),
@@ -83,6 +84,7 @@ class Setor(models.Model):
         (TESOURARIA, 'Tesouraria'),
         (SJD, 'SJD'),
         (OUTROS,'Outros'),
+        (ARQUIVO, 'Arquivo'),
     )
     setor = models.CharField(max_length=32,choices=SETOR)
     def __str__(self):
@@ -121,7 +123,7 @@ class Parte(models.Model):
     class Meta:
         verbose_name = 'parte'
         verbose_name_plural = 'partes'
-        ordering = ["author", "descricao","tipoParte"]
+        ordering = ["tipoParte__tpDescricao","author", "descricao"]
 
     def authorname(self):
         return self.author.first_name +" "+ self.author.last_name
@@ -140,11 +142,20 @@ class Parte(models.Model):
             return qs
 
 class Validacao(models.Model):
+    DEFIRO = 'DEFIRO'
+    INDEFIRO = 'INDEFIRO'
+    STATUS = (
+        (DEFIRO, 'DEFIRO'),
+        (INDEFIRO, 'INDEFIRO'),
+    )
+    status = models.CharField(max_length=32, choices=STATUS)
     observacao = models.TextField(null=False)
     data_autorizacao = models.DateTimeField(
             blank=True, null=True)
     parte = models.ForeignKey(Parte)
     user_validacao = models.ForeignKey('auth.User',null=True,blank=True)
+
+
     def __str__(self):
         return self.observacao
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>
@@ -80,7 +80,7 @@
     <div class="row">
         {% if user.is_authenticated %}
         <div class="col s9">
-            Bem vindo(a), {{ user.profile.nome_guerra }} - {{ user.profile.setor }}.
+            Bem vindo(a), {{ user.profile.graduacao }} {{ user.profile.nome_guerra }} - {{ user.profile.setor }}.
         </div>
 
         <div class="col s1">
@@ -99,7 +99,7 @@
             </a>
         </div>
         <div class="col s1">
-            <a href="/admin/logout/?next=http://6bpm-server/">
+            <a href="/admin/logout/?next=http://10.47.26.178/">
                 <i class="material-icons right">directions_run</i>
             </a>
         </div>
@@ -123,9 +123,9 @@
         <p class="col s2"><a href="{% url 'parts_list' tipo='férias'%}">Férias</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='deslocamento'%}">Deslocamento</a></p>
         <p class="col s2"><a href="{% url 'parts_list' tipo='publicadas'%}">Publicadas</a></p>
-        <p class="col s2"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
+        <p class="col s1"><a href="{% url 'parts_list' tipo='outros'%}">{{ user.profile.setor.setor }}</a></p>
         {% if user.profile.nivelAutorizacao.nivel != 'nenhum' %}
-            <p class="col s2"><a href="{% url 'parts_list' tipo='despachos'%}">Despachadas</a></p>
+            <p class="col s1"><a href="{% url 'parts_list' tipo='despachos'%}">Despachadas</a></p>
         {% endif %}
 
     </div>
